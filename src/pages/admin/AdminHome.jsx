@@ -95,7 +95,8 @@ export default function AdminHome() {
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <div>
+        <div className={styles.titleWrap}>
+          <p className={styles.eyebrow}>Admin Panel</p>
           <h1 className={styles.title}>Dashboard & Pengaturan</h1>
           <p className={styles.subtitle}>Kelola semua konten website Anda</p>
         </div>
@@ -346,6 +347,7 @@ export default function AdminHome() {
 
         {/* SAVE BUTTON */}
         <div className={styles.saveBar}>
+          <span className={styles.saveHint}>Perubahan belum disimpan otomatis</span>
           <button className={`${styles.btnSaveMain} ${saved ? styles.savedAnim : ''}`} onClick={handleSave}>
             {saved ? '✅ Tersimpan!' : '💾 Simpan Semua Perubahan'}
           </button>

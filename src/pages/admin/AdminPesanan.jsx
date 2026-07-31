@@ -47,6 +47,7 @@ export default function AdminPesanan() {
   return (
     <div className={styles.page}>
       <div className={styles.header}>
+        <p className={styles.eyebrow}>Admin Panel</p>
         <h1 className={styles.title}>Kelola Pesanan</h1>
         <p className={styles.subtitle}>Pantau dan kelola semua pesanan masuk</p>
       </div>

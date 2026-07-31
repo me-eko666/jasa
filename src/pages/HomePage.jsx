@@ -28,6 +28,7 @@ export default function HomePage() {
   const [settings, setSettings] = useState(null)
   const [form, setForm] = useState({ nama: '', no_wa: '', layanan: '', catatan: '' })
   const [position, setPosition] = useState(null)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [address, setAddress] = useState('')
   const [mapCenter] = useState([-6.2, 106.816])
   const [submitted, setSubmitted] = useState(false)
@@ -108,37 +109,111 @@ export default function HomePage() {
       {/* ===== NAVBAR ===== */}
       <nav style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 200,
-        background: 'rgba(10,4,0,0.92)', backdropFilter: 'blur(16px)',
+        background: 'rgba(10,4,0,0.95)', backdropFilter: 'blur(16px)',
         borderBottom: `1px solid ${pc}22`,
         height: 66, display: 'flex', alignItems: 'center',
-        justifyContent: 'space-between', padding: '0 32px',
+        justifyContent: 'space-between', padding: '0 24px',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        {/* Brand */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{
-            width: 42, height: 42, borderRadius: 12,
+            width: 40, height: 40, borderRadius: 11,
             background: `linear-gradient(135deg, ${pc}, ${pc2})`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 22, boxShadow: `0 0 18px ${pc}55`,
+            fontSize: 20, boxShadow: `0 0 18px ${pc}55`, flexShrink: 0,
           }}>{settings.logo || '💆'}</div>
           <span style={{
-            fontWeight: 800, fontSize: 20, letterSpacing: 0.5,
+            fontWeight: 800, fontSize: 18, letterSpacing: 0.5,
             background: `linear-gradient(90deg, #FFD700, ${pc})`,
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+            whiteSpace: 'nowrap',
           }}>{settings.nama_usaha}</span>
         </div>
-        <div style={{ display: 'flex', gap: 6 }}>
+
+        {/* Desktop nav links */}
+        <div style={{ display: 'flex', gap: 6, '@media(max-width:640px)': { display: 'none' } }} className="nav-desktop">
           {navBtns.map(n => (
-            <button key={n.key} onClick={() => scrollTo(n.id, n.key)} style={{
-              padding: '7px 18px', borderRadius: 20, fontSize: 13, fontWeight: 600,
+            <button key={n.key} onClick={() => { scrollTo(n.id, n.key); setMobileMenuOpen(false) }} style={{
+              padding: '7px 16px', borderRadius: 20, fontSize: 13, fontWeight: 600,
               cursor: 'pointer', transition: 'all 0.2s',
               background: activeNav === n.key ? `linear-gradient(135deg, ${pc}, ${pc2})` : 'transparent',
-              border: `1px solid ${activeNav === n.key ? pc : pc + '33'}`,
-              color: activeNav === n.key ? '#fff' : '#aaa',
+              border: `1px solid ${activeNav === n.key ? pc : pc + '28'}`,
+              color: activeNav === n.key ? '#fff' : '#888',
               boxShadow: activeNav === n.key ? `0 0 12px ${pc}44` : 'none',
+              whiteSpace: 'nowrap',
             }}>{n.label}</button>
           ))}
         </div>
+
+        {/* Hamburger (mobile) */}
+        <button
+          onClick={() => setMobileMenuOpen(o => !o)}
+          className="nav-hamburger"
+          style={{
+            width: 40, height: 40, borderRadius: 10,
+            background: mobileMenuOpen ? `linear-gradient(135deg, ${pc}, ${pc2})` : `rgba(184,134,11,0.1)`,
+            border: `1px solid ${pc}33`,
+            display: 'none', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center', gap: 5,
+            cursor: 'pointer', flexShrink: 0,
+          }}
+          aria-label="Toggle menu"
+        >
+          <span style={{
+            display: 'block', width: 18, height: 2,
+            background: mobileMenuOpen ? '#fff' : pc, borderRadius: 2,
+            transform: mobileMenuOpen ? 'translateY(7px) rotate(45deg)' : 'none',
+            transition: 'all 0.25s',
+          }} />
+          <span style={{
+            display: 'block', width: 18, height: 2,
+            background: mobileMenuOpen ? '#fff' : pc, borderRadius: 2,
+            opacity: mobileMenuOpen ? 0 : 1,
+            transition: 'all 0.25s',
+          }} />
+          <span style={{
+            display: 'block', width: 18, height: 2,
+            background: mobileMenuOpen ? '#fff' : pc, borderRadius: 2,
+            transform: mobileMenuOpen ? 'translateY(-7px) rotate(-45deg)' : 'none',
+            transition: 'all 0.25s',
+          }} />
+        </button>
       </nav>
+
+      {/* Mobile dropdown menu */}
+      <div style={{
+        position: 'fixed', top: 66, left: 0, right: 0, zIndex: 199,
+        background: 'rgba(10,4,0,0.98)',
+        borderBottom: `1px solid ${pc}22`,
+        backdropFilter: 'blur(16px)',
+        padding: mobileMenuOpen ? '16px 20px 20px' : '0 20px',
+        maxHeight: mobileMenuOpen ? '300px' : '0',
+        overflow: 'hidden',
+        transition: 'all 0.28s cubic-bezier(0.4,0,0.2,1)',
+        display: 'flex', flexDirection: 'column', gap: 8,
+      }} className="nav-mobile-dropdown">
+        {navBtns.map(n => (
+          <button key={n.key} onClick={() => { scrollTo(n.id, n.key); setMobileMenuOpen(false) }} style={{
+            padding: '13px 18px', borderRadius: 12, fontSize: 15, fontWeight: 600,
+            cursor: 'pointer', textAlign: 'left',
+            background: activeNav === n.key ? `linear-gradient(135deg, ${pc}33, ${pc2}22)` : 'rgba(255,255,255,0.03)',
+            border: `1px solid ${activeNav === n.key ? pc + '55' : pc + '18'}`,
+            color: activeNav === n.key ? '#FFD700' : '#aaa',
+            width: '100%',
+          }}>{n.label}</button>
+        ))}
+      </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .nav-desktop { display: none !important; }
+          .nav-hamburger { display: flex !important; }
+        }
+        @media (min-width: 641px) {
+          .nav-mobile-dropdown { display: none !important; }
+          .nav-hamburger { display: none !important; }
+        }
+      `}</style>
 
       {/* ===== HERO ===== */}
       <section id="sec-beranda" style={{

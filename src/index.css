@@ -1,18 +1,96 @@
-* {
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap');
+
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+:root {
+  --gold: #b8860b;
+  --gold-light: #FFD700;
+  --gold-dark: #8B6914;
+  --bg-base: #0a0400;
+  --bg-mid: #0f0600;
+  --bg-card: rgba(255,255,255,0.03);
+  --border: rgba(184,134,11,0.2);
+  --text: #ffffff;
+  --text-muted: #888;
+  --radius: 14px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #f5f5f5;
+  background: var(--bg-base);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
 }
 
 #root {
   min-height: 100vh;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0400;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #b8860b, #8B6914);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #FFD700;
+}
+
+/* ── SELECTION ── */
+::selection {
+  background: rgba(184,134,11,0.35);
+  color: #FFD700;
+}
+
+/* ── BUTTONS RESET ── */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: none;
+}
+
+/* ── INPUTS RESET ── */
+input, textarea, select {
+  font-family: inherit;
+  outline: none;
+}
+
+/* ── LINKS RESET ── */
+a {
+  color: inherit;
+}
+
+/* ── HEADINGS ACCENT ── */
+h1, h2 {
+  font-family: 'Playfair Display', 'Inter', serif;
+}
+
+/* ── LEAFLET DARK TILES OVERLAY ── */
+.leaflet-container {
+  background: #1a0a00 !important;
+  border-radius: inherit;
+}
+
+/* ── GOLD GLOW UTILITY ── */
+.glow-gold {
+  box-shadow: 0 0 30px rgba(184,134,11,0.4), 0 0 60px rgba(184,134,11,0.15);
 }
