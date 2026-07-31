@@ -1,0 +1,95 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+}
+.modal {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 1.5rem 0;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 1;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1rem;
+}
+.modalHeader h2 { font-size: 1.3rem; color: #222; }
+.closeBtn {
+  background: #f0f0f0;
+  border-radius: 50%;
+  width: 36px; height: 36px;
+  font-size: 1rem;
+  color: #555;
+  transition: background 0.2s;
+}
+.closeBtn:hover { background: #e0e0e0; }
+.modalBody { padding: 1.5rem; }
+
+.inlineWrap {
+  background: rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.form { display: flex; flex-direction: column; gap: 1.2rem; }
+.formGroup { display: flex; flex-direction: column; gap: 0.4rem; }
+.formGroup label { font-size: 0.9rem; font-weight: 600; color: #444; }
+
+.inlineWrap .formGroup label { color: #d8f3dc; }
+
+.formGroup input,
+.formGroup textarea,
+.formGroup select {
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+  background: #fff;
+}
+.formGroup input:focus,
+.formGroup textarea:focus,
+.formGroup select:focus { border-color: #52b788; }
+.formGroup textarea { resize: vertical; }
+
+.btnLocation {
+  padding: 0.65rem 1.2rem;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.7rem;
+  transition: opacity 0.2s;
+}
+.btnLocation:hover { opacity: 0.85; }
+.mapWrap { border-radius: 12px; overflow: hidden; border: 2px solid #ddd; }
+.locInfo { font-size: 0.85rem; color: #52b788; margin-top: 0.4rem; font-weight: 600; }
+.inlineWrap .locInfo { color: #d8f3dc; }
+
+.btnSubmit {
+  padding: 0.9rem;
+  border-radius: 10px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.btnSubmit:hover { opacity: 0.88; transform: translateY(-1px); }
