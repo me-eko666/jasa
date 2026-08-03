@@ -3,7 +3,7 @@ import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import styles from './AdminLayout.module.css'
 
 const navLinks = [
-  { to: '/admin',         end: true,  icon: '⚙️', label: 'Dashboard & Pengaturan' },
+  { to: '/admin',         end: true,  icon: '⚙️', label: 'Dashboard' },
   { to: '/admin/pesanan', end: false, icon: '📋', label: 'Kelola Pesanan' },
   { to: '/',              end: true,  icon: '🏠', label: 'Lihat Website' },
 ]
@@ -23,12 +23,12 @@ export default function AdminLayout({ setAuth }) {
   }, [open])
 
   const pageTitle =
-    location.pathname === '/admin'              ? 'Dashboard & Pengaturan' :
+    location.pathname === '/admin'              ? 'Dashboard' :
     location.pathname.startsWith('/admin/pesanan') ? 'Kelola Pesanan'        : ''
 
   const { businessName } = (() => {
     try {
-      const s = JSON.parse(localStorage.getItem('pijat_settings') || '{}')
+      const s = JSON.parse(localStorage.getItem('pijat_settings_cache') || localStorage.getItem('pijat_settings') || '{}')
       return { businessName: s.nama_usaha || 'Pijat Admin' }
     } catch { return { businessName: 'Pijat Admin' } }
   })()

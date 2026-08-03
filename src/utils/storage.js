@@ -17,6 +17,7 @@ const DEFAULT_SETTINGS = {
   warna_sekunder: '#1877F2',
   admin_username: 'echorockers06',
   admin_password: '11November',
+  telegram:       '',
   layanan: [
     { id: 1, nama: 'Pijat Relaksasi',  deskripsi: 'Pijat lembut untuk merilekskan seluruh tubuh dan menghilangkan stres.',          durasi: '60 menit', harga: 'Rp 100.000', icon: '💆', gambar: '' },
     { id: 2, nama: 'Pijat Refleksi',   deskripsi: 'Fokus pada titik-titik refleksi telapak kaki untuk kesehatan optimal.',           durasi: '45 menit', harga: 'Rp 80.000',  icon: '🦶', gambar: '' },

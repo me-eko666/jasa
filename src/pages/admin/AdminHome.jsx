@@ -102,7 +102,7 @@ export default function AdminHome() {
       <div className={styles.header}>
         <div className={styles.titleWrap}>
           <p className={styles.eyebrow}>Admin Panel</p>
-          <h1 className={styles.title}>Dashboard & Pengaturan</h1>
+          <h1 className={styles.title}>Dashboard</h1>
           <p className={styles.subtitle}>Kelola semua konten website Anda</p>
         </div>
         <div className={styles.headerStats}>
@@ -169,6 +169,10 @@ export default function AdminHome() {
               <div className={styles.field}>
                 <label>Nomor WhatsApp (dengan kode negara, e.g. 628xxx)</label>
                 <input value={settings.whatsapp} onChange={e => updateField('whatsapp', e.target.value)} />
+              </div>
+              <div className={styles.field}>
+                <label>Username Telegram (opsional, e.g. @namauser)</label>
+                <input placeholder="@username" value={settings.telegram||''} onChange={e => updateField('telegram', e.target.value)} />
               </div>
               <div className={`${styles.field} ${styles.fullWidth}`}>
                 <label>Alamat</label>

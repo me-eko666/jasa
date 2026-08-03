@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
+import Select from 'react-select'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { getSettings, tambahPesanan } from '../utils/storage'
@@ -75,17 +76,26 @@ export default function HomePage() {
     )
   }
 
-  const handleSubmit = async e => {
-    e.preventDefault()
+  const buildMsg = (p) =>
+    `*🌿 Pesanan Pijat Baru!*\n\n👤 Nama: ${form.nama}\n📱 WA: ${form.no_wa}\n💆 Layanan: ${form.layanan}\n📍 Alamat: ${address}\n📝 Catatan: ${form.catatan||'-'}\n🔖 ID: #${p.id}`
+
+  const handleSubmit = async (via) => {
     if (!form.nama || !form.no_wa || !form.layanan) return alert('Lengkapi nama, WhatsApp, dan layanan.')
     if (!address) return alert('Masukkan alamat atau pin lokasi di peta.')
     const p = await tambahPesanan({ nama:form.nama, no_wa:form.no_wa, layanan:form.layanan,
       alamat:address, catatan:form.catatan, lat:position?.lat||null, lng:position?.lng||null })
     setSubmitted(true)
-    const wa = settings?.whatsapp || '6281234567890'
-    const wn = wa.startsWith('0') ? '62'+wa.slice(1) : wa
-    const msg = `*🌿 Pesanan Pijat Baru!*\n\n👤 Nama: ${form.nama}\n📱 WA: ${form.no_wa}\n💆 Layanan: ${form.layanan}\n📍 Alamat: ${address}\n📝 Catatan: ${form.catatan||'-'}\n🔖 ID: #${p.id}`
-    setTimeout(() => window.open(`https://wa.me/${wn}?text=${encodeURIComponent(msg)}`, '_blank'), 400)
+    const msg = buildMsg(p)
+    if (via === 'wa') {
+      const wa = settings?.whatsapp || '6281234567890'
+      const wn = wa.startsWith('0') ? '62'+wa.slice(1) : wa
+      setTimeout(() => window.open(`https://wa.me/${wn}?text=${encodeURIComponent(msg)}`, '_blank'), 400)
+    } else {
+      const tg = settings?.telegram || ''
+      if (!tg) return alert('Admin belum mengatur username Telegram.')
+      const tgUser = tg.replace('@','')
+      setTimeout(() => window.open(`https://t.me/${tgUser}?text=${encodeURIComponent(msg)}`, '_blank'), 400)
+    }
   }
 
   if (!settings) return (
@@ -219,7 +229,7 @@ export default function HomePage() {
         paddingTop:64, paddingBottom:60, paddingLeft:24, paddingRight:24,
         position:'relative', overflow:'hidden',
         background: settings.hero_image
-          ? `linear-gradient(rgba(250,250,248,0.80),rgba(250,250,248,0.92)),url(${settings.hero_image}) center/cover`
+          ? `linear-gradient(rgba(250,250,248,0.30),rgba(250,250,248,0.92)),url(${settings.hero_image}) center/cover`
           : `linear-gradient(165deg, #FDF8EF 0%, #FAFAF8 50%, #F4EFE4 100%)`,
       }}>
         {/* Decorative rings */}
@@ -242,7 +252,7 @@ export default function HomePage() {
             padding:'7px 18px', borderRadius:99,
             background:BM, border:BD,
             fontSize:12, fontWeight:700, color:pc, letterSpacing:1,
-            textTransform:'uppercase', marginBottom:28,
+            textTransform:'uppercase', marginBottom:28, marginTop:20,
           }}>✦ Home Service Profesional</div>
 
           {/* Icon */}
@@ -437,7 +447,7 @@ export default function HomePage() {
                 }}>Pesan Lagi</button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} style={{
+            <form onSubmit={e => e.preventDefault()} style={{
               background:W, borderRadius:24, padding:'36px 32px',
               border:`1px solid rgba(154,123,47,0.12)`,
               boxShadow:'0 8px 40px rgba(154,123,47,0.09)',
@@ -461,18 +471,42 @@ export default function HomePage() {
 
               <div style={{ marginBottom:20 }}>
                 <label style={{ display:'block', fontSize:12, fontWeight:700, color:pc, marginBottom:7, letterSpacing:0.3, textTransform:'uppercase' }}>Pilih Layanan *</label>
-                <select value={form.layanan} onChange={e=>setForm({...form,layanan:e.target.value})} required
-                  style={{ width:'100%', padding:'13px 16px', borderRadius:12, fontSize:14.5,
-                    border:`1.5px solid rgba(154,123,47,0.18)`, background:BG, color:T,
-                    cursor:'pointer', fontFamily:sans, transition:'all 0.18s' }}
-                  onFocus={e=>{e.target.style.borderColor=pc; e.target.style.boxShadow=`0 0 0 3px rgba(154,123,47,0.10)`}}
-                  onBlur={e=>{e.target.style.borderColor='rgba(154,123,47,0.18)'; e.target.style.boxShadow='none'}}
-                >
-                  <option value="">— Pilih layanan —</option>
-                  {(settings.layanan||[]).map(s=>(
-                    <option key={s.id} value={s.nama}>{s.nama} — {s.harga} ({s.durasi})</option>
-                  ))}
-                </select>
+                <Select
+                  placeholder="🔍 Cari atau pilih layanan..."
+                  noOptionsMessage={() => 'Layanan tidak ditemukan'}
+                  isClearable
+                  options={(settings.layanan||[]).map(s=>({
+                    value: s.nama,
+                    label: `${s.icon||'💆'} ${s.nama} — ${s.harga} (${s.durasi})`,
+                  }))}
+                  value={form.layanan ? {
+                    value: form.layanan,
+                    label: (() => { const s=(settings.layanan||[]).find(x=>x.nama===form.layanan); return s?`${s.icon||'💆'} ${s.nama} — ${s.harga} (${s.durasi})`:form.layanan })()
+                  } : null}
+                  onChange={opt => setForm({...form, layanan: opt ? opt.value : ''})}
+                  styles={{
+                    control: (base, state) => ({
+                      ...base, borderRadius:12, padding:'3px 4px', fontSize:14.5, fontFamily:sans,
+                      borderColor: state.isFocused ? pc : 'rgba(24,119,242,0.18)',
+                      boxShadow: state.isFocused ? `0 0 0 3px rgba(24,119,242,0.10)` : 'none',
+                      background: state.isFocused ? '#fff' : BG,
+                      '&:hover':{ borderColor: pc },
+                    }),
+                    option: (base, state) => ({
+                      ...base, fontSize:14, fontFamily:sans, cursor:'pointer', borderRadius:8, margin:'2px 0',
+                      background: state.isSelected ? pc : state.isFocused ? BM : '#fff',
+                      color: state.isSelected ? '#fff' : T,
+                    }),
+                    menu: base => ({ ...base, borderRadius:14, border:`1px solid rgba(24,119,242,0.15)`, boxShadow:'0 8px 24px rgba(24,119,242,0.13)', overflow:'hidden' }),
+                    menuList: base => ({ ...base, padding:6 }),
+                    placeholder: base => ({ ...base, color:'#9EB3D8', fontSize:14.5, fontFamily:sans }),
+                    singleValue: base => ({ ...base, color:T, fontFamily:sans }),
+                    input: base => ({ ...base, fontFamily:sans }),
+                    clearIndicator: base => ({ ...base, color:'#aab', cursor:'pointer', '&:hover':{ color:'#E53935' } }),
+                    dropdownIndicator: base => ({ ...base, color:pc }),
+                    indicatorSeparator: base => ({ ...base, background:'rgba(24,119,242,0.15)' }),
+                  }}
+                />
               </div>
 
               <div style={{ marginBottom:20 }}>
@@ -521,20 +555,47 @@ export default function HomePage() {
                 />
               </div>
 
-              <button type="submit" style={{
-                width:'100%', padding:'16px', borderRadius:99, fontSize:16, fontWeight:800,
-                background:`linear-gradient(135deg,${GL},${pc})`, color:W,
-                border:'none', cursor:'pointer', letterSpacing:0.5,
-                boxShadow:`0 6px 24px rgba(154,123,47,0.28)`, fontFamily:sans,
-                transition:'all 0.2s',
-              }}>Kirim Pesanan via WhatsApp 🚀</button>
+              {/* Send buttons */}
+              <div style={{ display:'flex', gap:10, flexDirection:'column' }}>
+                <div style={{ fontSize:11, fontWeight:700, color:G, letterSpacing:0.5, textTransform:'uppercase', marginBottom:4 }}>
+                  Kirim pesanan via:
+                </div>
+                <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
+                  <button type="button" onClick={() => handleSubmit('wa')} style={{
+                    flex:1, minWidth:140, padding:'15px 20px', borderRadius:99, fontSize:15, fontWeight:800,
+                    background:'#25D366', color:'#fff', border:'none', cursor:'pointer',
+                    boxShadow:'0 6px 20px rgba(37,211,102,0.32)', fontFamily:sans,
+                    display:'flex', alignItems:'center', justifyContent:'center', gap:8, transition:'all 0.2s',
+                  }}
+                    onMouseEnter={e=>e.currentTarget.style.transform='translateY(-2px)'}
+                    onMouseLeave={e=>e.currentTarget.style.transform='none'}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                    WhatsApp
+                  </button>
+                  {settings?.telegram && (
+                    <button type="button" onClick={() => handleSubmit('telegram')} style={{
+                      flex:1, minWidth:140, padding:'15px 20px', borderRadius:99, fontSize:15, fontWeight:800,
+                      background:'#229ED9', color:'#fff', border:'none', cursor:'pointer',
+                      boxShadow:'0 6px 20px rgba(34,158,217,0.32)', fontFamily:sans,
+                      display:'flex', alignItems:'center', justifyContent:'center', gap:8, transition:'all 0.2s',
+                    }}
+                      onMouseEnter={e=>e.currentTarget.style.transform='translateY(-2px)'}
+                      onMouseLeave={e=>e.currentTarget.style.transform='none'}
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                      Telegram
+                    </button>
+                  )}
+                </div>
+              </div>
             </form>
           )}
         </div>
       </section>
 
       {/* ─── FOOTER ─── */}
-      <footer style={{ background:'#18120A', padding:'48px 24px 32px', textAlign:'center' }}>
+      <footer style={{ background:'rgb(27, 39, 31)', padding:'48px 24px 32px', textAlign:'center' }}>
         <div style={{
           width:52, height:52, borderRadius:'50%', margin:'0 auto 14px',
           background:`linear-gradient(135deg,${GL},${pc})`,
