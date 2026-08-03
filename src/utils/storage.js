@@ -1,77 +1,114 @@
-// Utility untuk mengelola data JSON di localStorage
+// ─── Firebase Realtime Database REST API ───────────────────
+const DB = 'https://jasa-jakarta-default-rtdb.firebaseio.com'
 
+// ─── DEFAULT DATA ───────────────────────────────────────────
 const DEFAULT_SETTINGS = {
-  nama_usaha: "Pijat Prima",
-  logo: "💆",
-  tagline: "Sentuhan Terbaik untuk Kesehatanmu",
-  deskripsi: "Layanan pijat profesional dengan terapis berpengalaman. Hadir di lokasi Anda untuk kenyamanan maksimal.",
-  telepon: "08123456789",
-  whatsapp: "6281234567890",
-  alamat: "Jl. Sehat No. 1, Kota Rileks",
-  jam_buka: "08:00 - 22:00",
-  footer_text: "© 2024 Pijat Prima · Semua Hak Dilindungi",
-  hero_image: "",
-  warna_utama: "#b8860b",
-  warna_sekunder: "#8B6914",
-  admin_username: "echorockers06",
-  admin_password: "11November",
+  nama_usaha:   'Pijat Prima',
+  logo:         '💆',
+  tagline:      'Sentuhan Terbaik untuk Kesehatanmu',
+  deskripsi:    'Layanan pijat profesional dengan terapis berpengalaman. Hadir di lokasi Anda untuk kenyamanan maksimal.',
+  telepon:      '08123456789',
+  whatsapp:     '6281234567890',
+  alamat:       'Jl. Sehat No. 1, Jakarta',
+  jam_buka:     '08:00 - 22:00',
+  footer_text:  '© 2025 Pijat Prima · Semua Hak Dilindungi',
+  hero_image:   '',
+  warna_utama:  '#1877F2',
+  warna_sekunder: '#1877F2',
+  admin_username: 'echorockers06',
+  admin_password: '11November',
   layanan: [
-    { id: 1, nama: "Pijat Relaksasi", deskripsi: "Pijat lembut untuk merilekskan seluruh tubuh dan menghilangkan stres.", durasi: "60 menit", harga: "Rp 100.000", icon: "💆", gambar: "" },
-    { id: 2, nama: "Pijat Refleksi", deskripsi: "Fokus pada titik-titik refleksi telapak kaki untuk kesehatan optimal.", durasi: "45 menit", harga: "Rp 80.000", icon: "🦶", gambar: "" },
-    { id: 3, nama: "Pijat Shiatsu", deskripsi: "Teknik pijat Jepang dengan penekanan pada titik meridian tubuh.", durasi: "90 menit", harga: "Rp 150.000", icon: "🙌", gambar: "" },
-    { id: 4, nama: "Pijat Sport", deskripsi: "Pijat khusus atlet untuk pemulihan otot pasca latihan atau pertandingan.", durasi: "60 menit", harga: "Rp 120.000", icon: "💪", gambar: "" },
+    { id: 1, nama: 'Pijat Relaksasi',  deskripsi: 'Pijat lembut untuk merilekskan seluruh tubuh dan menghilangkan stres.',          durasi: '60 menit', harga: 'Rp 100.000', icon: '💆', gambar: '' },
+    { id: 2, nama: 'Pijat Refleksi',   deskripsi: 'Fokus pada titik-titik refleksi telapak kaki untuk kesehatan optimal.',           durasi: '45 menit', harga: 'Rp 80.000',  icon: '🦶', gambar: '' },
+    { id: 3, nama: 'Pijat Shiatsu',    deskripsi: 'Teknik pijat Jepang dengan penekanan pada titik meridian tubuh.',                 durasi: '90 menit', harga: 'Rp 150.000', icon: '🙌', gambar: '' },
+    { id: 4, nama: 'Pijat Sport',      deskripsi: 'Pijat khusus atlet untuk pemulihan otot pasca latihan atau pertandingan.',        durasi: '60 menit', harga: 'Rp 120.000', icon: '💪', gambar: '' },
   ],
   testimoni: [
-    { nama: "Budi Santoso", avatar: "👨", bintang: 5, pesan: "Sangat memuaskan! Terapis sangat profesional dan badan jadi segar kembali." },
-    { nama: "Siti Rahayu", avatar: "👩", bintang: 5, pesan: "Pijat refleksinya enak banget, tidur jadi lebih nyenyak setelahnya." },
-    { nama: "Ahmad Fauzi", avatar: "🧑", bintang: 5, pesan: "Harga terjangkau, kualitas bintang lima. Highly recommended!" },
+    { nama: 'Budi Santoso', avatar: '👨', bintang: 5, pesan: 'Sangat memuaskan! Terapis sangat profesional dan badan jadi segar kembali.' },
+    { nama: 'Siti Rahayu',  avatar: '👩', bintang: 5, pesan: 'Pijat refleksinya enak banget, tidur jadi lebih nyenyak setelahnya.' },
+    { nama: 'Ahmad Fauzi',  avatar: '🧑', bintang: 5, pesan: 'Harga terjangkau, kualitas bintang lima. Highly recommended!' },
   ],
 }
 
-export const getSettings = () => {
-  const data = localStorage.getItem('pijat_settings')
-  if (data) {
-    const parsed = JSON.parse(data)
-    // Merge with defaults to ensure new fields exist
-    return { ...DEFAULT_SETTINGS, ...parsed }
+// ════════════════════════════════════════════════════════════
+//  SETTINGS
+// ════════════════════════════════════════════════════════════
+
+/** Ambil settings — selalu dari Firebase, fallback ke localStorage */
+export const getSettings = async () => {
+  try {
+    const res = await fetch(`${DB}/settings.json`)
+    if (!res.ok) throw new Error('fetch failed')
+    const data = await res.json()
+    if (data) {
+      // cache lokal buat offline fallback
+      localStorage.setItem('pijat_settings_cache', JSON.stringify(data))
+      return { ...DEFAULT_SETTINGS, ...data }
+    }
+    // Belum ada di DB → inisialisasi dengan default
+    await saveSettings(DEFAULT_SETTINGS)
+    return DEFAULT_SETTINGS
+  } catch {
+    // Offline → pakai cache
+    const cache = localStorage.getItem('pijat_settings_cache')
+    return cache ? { ...DEFAULT_SETTINGS, ...JSON.parse(cache) } : DEFAULT_SETTINGS
   }
-  localStorage.setItem('pijat_settings', JSON.stringify(DEFAULT_SETTINGS))
-  return DEFAULT_SETTINGS
 }
 
-export const saveSettings = (settings) => {
-  localStorage.setItem('pijat_settings', JSON.stringify(settings))
+/** Simpan settings ke Firebase + update cache lokal */
+export const saveSettings = async (settings) => {
+  localStorage.setItem('pijat_settings_cache', JSON.stringify(settings))
+  await fetch(`${DB}/settings.json`, {
+    method:  'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(settings),
+  })
 }
 
-export const getPesanan = () => {
-  const data = localStorage.getItem('pijat_pesanan')
-  if (data) return JSON.parse(data)
-  return []
+// ════════════════════════════════════════════════════════════
+//  PESANAN
+// ════════════════════════════════════════════════════════════
+
+/** Ambil semua pesanan dari Firebase */
+export const getPesanan = async () => {
+  try {
+    const res = await fetch(`${DB}/pesanan.json`)
+    if (!res.ok) throw new Error()
+    const data = await res.json()
+    if (!data) return []
+    // Firebase returns object with keys, convert to array sorted newest first
+    return Object.values(data).sort((a, b) => b.id - a.id)
+  } catch {
+    return []
+  }
 }
 
-export const tambahPesanan = (pesanan) => {
-  const list = getPesanan()
+/** Tambah pesanan baru */
+export const tambahPesanan = async (pesanan) => {
   const newItem = {
     ...pesanan,
-    id: Date.now(),
-    waktu: new Date().toLocaleString('id-ID'),
+    id:     Date.now(),
+    waktu:  new Date().toLocaleString('id-ID'),
     status: 'Menunggu',
   }
-  list.unshift(newItem)
-  localStorage.setItem('pijat_pesanan', JSON.stringify(list))
+  await fetch(`${DB}/pesanan/${newItem.id}.json`, {
+    method:  'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(newItem),
+  })
   return newItem
 }
 
-export const updateStatusPesanan = (id, status) => {
-  const list = getPesanan()
-  const idx = list.findIndex(p => p.id === id)
-  if (idx !== -1) {
-    list[idx].status = status
-    localStorage.setItem('pijat_pesanan', JSON.stringify(list))
-  }
+/** Update status pesanan */
+export const updateStatusPesanan = async (id, status) => {
+  await fetch(`${DB}/pesanan/${id}/status.json`, {
+    method:  'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(status),
+  })
 }
 
-export const hapusPesanan = (id) => {
-  const list = getPesanan().filter(p => p.id !== id)
-  localStorage.setItem('pijat_pesanan', JSON.stringify(list))
+/** Hapus pesanan */
+export const hapusPesanan = async (id) => {
+  await fetch(`${DB}/pesanan/${id}.json`, { method: 'DELETE' })
 }

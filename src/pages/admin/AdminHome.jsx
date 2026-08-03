@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { getSettings, saveSettings, getPesanan } from '../../utils/storage';
 import styles from './AdminHome.module.css';
 
@@ -6,6 +6,8 @@ export default function AdminHome() {
   const [settings, setSettings] = useState(null);
   const [tab, setTab] = useState('umum');
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [pesananCount, setPesananCount] = useState({ total: 0, baru: 0 });
 
   // Layanan editor
   const [editLayananIdx, setEditLayananIdx] = useState(null);
@@ -15,15 +17,18 @@ export default function AdminHome() {
   const [editTestiIdx, setEditTestiIdx] = useState(null);
   const [testiForm, setTestiForm] = useState(null);
 
-  const pesanan = getPesanan();
-  const pesananBaru = pesanan.filter(p => p.status === 'Menunggu').length;
-
   useEffect(() => {
-    setSettings(getSettings());
+    getSettings().then(s => setSettings(s));
+    getPesanan().then(list => setPesananCount({
+      total: list.length,
+      baru: list.filter(p => p.status === 'Menunggu').length,
+    }));
   }, []);
 
-  function handleSave() {
-    saveSettings(settings);
+  async function handleSave() {
+    setSaving(true);
+    await saveSettings(settings);
+    setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   }
@@ -102,11 +107,11 @@ export default function AdminHome() {
         </div>
         <div className={styles.headerStats}>
           <div className={styles.statCard}>
-            <span className={styles.statNum}>{pesanan.length}</span>
+            <span className={styles.statNum}>{pesananCount.total}</span>
             <span className={styles.statLabel}>Total Pesanan</span>
           </div>
           <div className={`${styles.statCard} ${styles.statBaru}`}>
-            <span className={styles.statNum}>{pesananBaru}</span>
+            <span className={styles.statNum}>{pesananCount.baru}</span>
             <span className={styles.statLabel}>Pesanan Baru</span>
           </div>
           <div className={styles.statCard}>
@@ -348,8 +353,8 @@ export default function AdminHome() {
         {/* SAVE BUTTON */}
         <div className={styles.saveBar}>
           <span className={styles.saveHint}>Perubahan belum disimpan otomatis</span>
-          <button className={`${styles.btnSaveMain} ${saved ? styles.savedAnim : ''}`} onClick={handleSave}>
-            {saved ? '✅ Tersimpan!' : '💾 Simpan Semua Perubahan'}
+          <button className={`${styles.btnSaveMain} ${saved ? styles.savedAnim : ''}`} onClick={handleSave} disabled={saving}>
+            {saving ? '⏳ Menyimpan...' : saved ? '✅ Tersimpan!' : '💾 Simpan Semua Perubahan'}
           </button>
         </div>
       </div>

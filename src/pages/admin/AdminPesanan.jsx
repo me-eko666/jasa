@@ -19,17 +19,20 @@ export default function AdminPesanan() {
 
   useEffect(() => { loadPesanan() }, [])
 
-  function loadPesanan() { setPesanan(getPesanan()) }
+  async function loadPesanan() { 
+    const list = await getPesanan()
+    setPesanan(list)
+  }
 
-  function handleChangeStatus(id, status) {
-    updateStatusPesanan(id, status)
+  async function handleChangeStatus(id, status) {
+    await updateStatusPesanan(id, status)
     loadPesanan()
     if (detail && detail.id === id) setDetail(prev => ({ ...prev, status }))
   }
 
-  function handleHapus(id) {
+  async function handleHapus(id) {
     if (!confirm('Hapus pesanan ini?')) return
-    hapusPesanan(id)
+    await hapusPesanan(id)
     loadPesanan()
     if (detail && detail.id === id) setDetail(null)
   }

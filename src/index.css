@@ -1,96 +1,52 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Lora:ital,wght@0,600;0,700;1,400;1,500&display=swap');
 
 *, *::before, *::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  margin: 0; padding: 0; box-sizing: border-box;
 }
 
 :root {
-  --gold: #b8860b;
-  --gold-light: #FFD700;
-  --gold-dark: #8B6914;
-  --bg-base: #0a0400;
-  --bg-mid: #0f0600;
-  --bg-card: rgba(255,255,255,0.03);
-  --border: rgba(184,134,11,0.2);
-  --text: #ffffff;
-  --text-muted: #888;
-  --radius: 14px;
+  --blue:    #1877F2;
+  --blue-lt: #4293F5;
+  --blue-dk: #0D5BB8;
+  --text:    #1C2B4A;
+  --muted:   #65748B;
+  --border:  rgba(24,119,242,0.13);
+  --white:   #FFFFFF;
+  --bg:      #F0F4FF;
+  --bg-warm: #E8F0FE;
+  --bg-mid:  #DCE8FD;
 }
 
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background: var(--bg-base);
+  background: var(--bg);
   color: var(--text);
   line-height: 1.6;
   overflow-x: hidden;
 }
 
-#root {
-  min-height: 100vh;
-}
+#root { min-height: 100vh; }
 
-/* ── SCROLLBAR ── */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #0a0400;
-}
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #b8860b, #8B6914);
-  border-radius: 999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #FFD700;
-}
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: #E8F0FE; }
+::-webkit-scrollbar-thumb { background: #4293F5; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #1877F2; }
 
-/* ── SELECTION ── */
-::selection {
-  background: rgba(184,134,11,0.35);
-  color: #FFD700;
-}
+/* Selection */
+::selection { background: rgba(24,119,242,0.15); color: #0D5BB8; }
 
-/* ── BUTTONS RESET ── */
-button {
-  font-family: inherit;
-  cursor: pointer;
-  border: none;
-  outline: none;
-  background: none;
-}
+button { font-family: inherit; cursor: pointer; border: none; outline: none; background: none; }
+input, textarea, select { font-family: inherit; outline: none; }
+a { color: inherit; }
 
-/* ── INPUTS RESET ── */
-input, textarea, select {
-  font-family: inherit;
-  outline: none;
-}
+/* Headings use Lora */
+h1, h2, h3 { font-family: 'Lora', Georgia, serif; }
 
-/* ── LINKS RESET ── */
-a {
-  color: inherit;
-}
+/* Leaflet override */
+.leaflet-container { font-family: inherit !important; }
 
-/* ── HEADINGS ACCENT ── */
-h1, h2 {
-  font-family: 'Playfair Display', 'Inter', serif;
-}
-
-/* ── LEAFLET DARK TILES OVERLAY ── */
-.leaflet-container {
-  background: #1a0a00 !important;
-  border-radius: inherit;
-}
-
-/* ── GOLD GLOW UTILITY ── */
-.glow-gold {
-  box-shadow: 0 0 30px rgba(184,134,11,0.4), 0 0 60px rgba(184,134,11,0.15);
-}
+option { background: #fff; color: #1C1610; }
