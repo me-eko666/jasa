@@ -45,7 +45,7 @@ export default function AdminHome() {
 
   function startAddLayanan() {
     setEditLayananIdx('new');
-    setLayananForm({ id: Date.now(), nama: '', deskripsi: '', harga: '', durasi: '', icon: '💆', gambar: '' });
+    setLayananForm({ id: Date.now(), nama: '', deskripsi: '', harga: '', durasi: '', icon: '💆', gambar: '', video: '' });
   }
 
   function saveLayanan() {
@@ -265,8 +265,26 @@ export default function AdminHome() {
                   </div>
                   <div className={`${styles.field} ${styles.fullWidth}`}>
                     <label>URL Gambar</label>
-                    <input value={layananForm.gambar} onChange={e => setLayananForm(p => ({...p, gambar: e.target.value}))} />
+                    <input value={layananForm.gambar} onChange={e => setLayananForm(p => ({...p, gambar: e.target.value}))} placeholder="https://..." />
                     {layananForm.gambar && <img src={layananForm.gambar} alt="preview" className={styles.imgPreview} />}
+                  </div>
+                  <div className={`${styles.field} ${styles.fullWidth}`}>
+                    <label>URL Video YouTube (opsional)</label>
+                    <input
+                      value={layananForm.video||''}
+                      onChange={e => setLayananForm(p => ({...p, video: e.target.value}))}
+                      placeholder="https://youtube.com/watch?v=... atau https://youtu.be/..."
+                    />
+                    {layananForm.video && (
+                      <div style={{ marginTop:8, borderRadius:10, overflow:'hidden', border:'1px solid rgba(24,119,242,0.15)', aspectRatio:'16/9' }}>
+                        <iframe
+                          src={`https://www.youtube.com/embed/${layananForm.video.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1]||''}`}
+                          style={{ width:'100%', height:'100%', border:'none' }}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media"
+                          allowFullScreen title="preview"
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className={styles.editActions}>

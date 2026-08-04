@@ -344,15 +344,15 @@ export default function HomePage() {
             {(settings.layanan||[]).map((s,i)=>(
               <div key={s.id||i} className="hp-card" style={{
                 background:W, borderRadius:20, padding:'26px 22px',
-                border:`1px solid rgba(154,123,47,0.10)`,
-                boxShadow:'0 2px 16px rgba(154,123,47,0.07)',
+                border:`1px solid rgba(24,119,242,0.10)`,
+                boxShadow:'0 2px 16px rgba(24,119,242,0.07)',
                 transition:'all 0.3s', cursor:'default',
               }}>
                 {s.gambar
                   ? <img src={s.gambar} alt={s.nama} style={{ width:'100%', height:140, objectFit:'cover', borderRadius:12, marginBottom:18 }}/>
                   : <div style={{
                       width:60, height:60, borderRadius:14, marginBottom:18,
-                      background:BM, border:`1px solid rgba(154,123,47,0.16)`,
+                      background:BW, border:`1px solid rgba(24,119,242,0.12)`,
                       display:'flex', alignItems:'center', justifyContent:'center', fontSize:28,
                     }}>{s.icon||'💆'}</div>
                 }
@@ -360,18 +360,18 @@ export default function HomePage() {
                   <h3 style={{ fontFamily:serif, fontSize:16, fontWeight:700, color:T }}>{s.nama}</h3>
                   <span style={{
                     fontSize:11, fontWeight:700, color:pc,
-                    background:BM, padding:'3px 10px', borderRadius:99,
-                    border:`1px solid rgba(154,123,47,0.14)`,
+                    background:BW, padding:'3px 10px', borderRadius:99,
+                    border:`1px solid rgba(24,119,242,0.14)`,
                   }}>{s.durasi}</span>
                 </div>
                 {s.deskripsi && <p style={{ fontSize:13, color:M, lineHeight:1.65, marginBottom:16 }}>{s.deskripsi}</p>}
-                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:14, borderTop:`1px solid rgba(154,123,47,0.10)` }}>
+                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:14, borderTop:`1px solid rgba(24,119,242,0.08)` }}>
                   <span style={{ fontSize:17, fontWeight:800, color:pc, fontFamily:sans }}>{s.harga}</span>
                   <button onClick={() => goTo('sec-pesan','pesan')} style={{
                     padding:'7px 16px', borderRadius:99, fontSize:12, fontWeight:700,
-                    background:`linear-gradient(135deg,${GL},${pc})`, color:W,
+                    background:pc, color:W,
                     border:'none', cursor:'pointer', fontFamily:sans,
-                    boxShadow:`0 2px 8px rgba(154,123,47,0.22)`,
+                    boxShadow:`0 2px 8px rgba(24,119,242,0.22)`,
                   }}>Pesan</button>
                 </div>
               </div>
@@ -379,6 +379,74 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ─── VIDEO SECTION ─── */}
+      {(settings.layanan||[]).some(s => s.video) && (
+        <section id="sec-video" style={{ padding:'96px 24px', background:W }}>
+          <div style={{ maxWidth:1040, margin:'0 auto' }}>
+            <div style={{ textAlign:'center', marginBottom:52 }}>
+              <div style={{ fontSize:11, fontWeight:700, color:pc, letterSpacing:4, textTransform:'uppercase', marginBottom:10 }}>Video Layanan</div>
+              <h2 style={{ fontFamily:serif, fontSize:'clamp(2rem,4vw,2.8rem)', fontWeight:700, color:T, marginBottom:14 }}>
+                Lihat Cara Kerja Kami
+              </h2>
+              <div style={{ width:48, height:2, background:pc, margin:'0 auto', borderRadius:99 }}/>
+            </div>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))', gap:28 }}>
+              {(settings.layanan||[]).filter(s=>s.video).map((s,i) => {
+                // Support YouTube URLs: full, short, embed
+                const getYtId = url => {
+                  if (!url) return null
+                  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)
+                  return m ? m[1] : null
+                }
+                const ytId = getYtId(s.video)
+                const embedUrl = ytId
+                  ? `https://www.youtube.com/embed/${ytId}?rel=0&modestbranding=1`
+                  : s.video // fallback: direct embed URL
+
+                return (
+                  <div key={s.id||i} style={{
+                    background:BG, borderRadius:20, overflow:'hidden',
+                    border:`1px solid rgba(24,119,242,0.10)`,
+                    boxShadow:'0 4px 20px rgba(24,119,242,0.08)',
+                  }}>
+                    {/* Video embed */}
+                    <div style={{ position:'relative', paddingBottom:'56.25%', height:0, overflow:'hidden' }}>
+                      <iframe
+                        src={embedUrl}
+                        title={s.nama}
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        style={{ position:'absolute', top:0, left:0, width:'100%', height:'100%' }}
+                      />
+                    </div>
+                    {/* Caption */}
+                    <div style={{ padding:'18px 20px' }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:6 }}>
+                        <span style={{
+                          width:36, height:36, borderRadius:10, flexShrink:0,
+                          background:BW, border:`1px solid rgba(24,119,242,0.12)`,
+                          display:'flex', alignItems:'center', justifyContent:'center', fontSize:18,
+                        }}>{s.icon||'💆'}</span>
+                        <div>
+                          <div style={{ fontWeight:700, color:T, fontSize:15, fontFamily:serif }}>{s.nama}</div>
+                          <div style={{ fontSize:12, color:M }}>{s.durasi} · <span style={{ color:pc, fontWeight:700 }}>{s.harga}</span></div>
+                        </div>
+                      </div>
+                      <button onClick={() => goTo('sec-pesan','pesan')} style={{
+                        width:'100%', padding:'10px', borderRadius:99, fontSize:13, fontWeight:700,
+                        background:pc, color:W, border:'none', cursor:'pointer',
+                        boxShadow:`0 2px 10px rgba(24,119,242,0.22)`, fontFamily:sans, marginTop:8,
+                      }}>Pesan Layanan Ini</button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ─── TESTIMONI ─── */}
       {settings.testimoni?.length > 0 && (
