@@ -57,25 +57,31 @@ function TikTokEmbed({ url }) {
   const ref = useRef(null)
   useEffect(() => {
     if (!ref.current) return
+    // Extract video ID — alphanumeric including letters
+    const videoId = url.match(/\/video\/([A-Za-z0-9_-]+)/)?.[1] || ''
     ref.current.innerHTML = `
       <blockquote class="tiktok-embed"
         cite="${url}"
-        data-video-id="${url.match(/\/video\/(\d+)/)?.[1]||''}"
+        data-video-id="${videoId}"
         style="max-width:100%;min-width:280px;border:none;">
+        <section></section>
       </blockquote>`
-    if (window.TikTok) {
-      // already loaded
-      window.TikTok.reload?.()
-    } else {
-      const s = document.createElement('script')
-      s.src = 'https://www.tiktok.com/embed.js'
-      s.async = true
-      document.body.appendChild(s)
-    }
+    // Remove old script then re-inject to force re-parse
+    const old = document.getElementById('tiktok-script')
+    if (old) old.remove()
+    const s = document.createElement('script')
+    s.id = 'tiktok-script'
+    s.src = 'https://www.tiktok.com/embed.js'
+    s.async = true
+    document.body.appendChild(s)
   }, [url])
   return (
-    <div ref={ref} style={{ background:'#000', minHeight:400, display:'flex', alignItems:'center', justifyContent:'center', padding:'8px', overflowX:'hidden' }}>
-      <span style={{ color:'#555', fontSize:13 }}>Memuat video TikTok...</span>
+    <div ref={ref} style={{
+      background:'#f8f8f8', minHeight:400,
+      display:'flex', alignItems:'center', justifyContent:'center',
+      padding:'8px', overflowX:'hidden',
+    }}>
+      <span style={{ color:'#888', fontSize:13 }}>⏳ Memuat video TikTok...</span>
     </div>
   )
 }
@@ -458,7 +464,7 @@ export default function HomePage() {
                 const isX = /(?:twitter\.com|x\.com)\/.+\/status\/(\d+)/.test(url)
 
                 // Detect TikTok
-                const isTikTok = /tiktok\.com\/.+\/video\/\d+/.test(url)
+                const isTikTok = /tiktok\.com\/.+\/video\/[A-Za-z0-9_-]+/.test(url)
 
                 return (
                   <div key={s.id||i} style={{
