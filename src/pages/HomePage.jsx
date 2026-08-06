@@ -54,34 +54,19 @@ function XEmbed({ url }) {
 
 // ── TikTok embed component ─────────────────────────────────
 function TikTokEmbed({ url }) {
-  const ref = useRef(null)
-  useEffect(() => {
-    if (!ref.current) return
-    // Extract video ID — alphanumeric including letters
-    const videoId = url.match(/\/video\/([A-Za-z0-9_-]+)/)?.[1] || ''
-    ref.current.innerHTML = `
-      <blockquote class="tiktok-embed"
-        cite="${url}"
-        data-video-id="${videoId}"
-        style="max-width:100%;min-width:280px;border:none;">
-        <section></section>
-      </blockquote>`
-    // Remove old script then re-inject to force re-parse
-    const old = document.getElementById('tiktok-script')
-    if (old) old.remove()
-    const s = document.createElement('script')
-    s.id = 'tiktok-script'
-    s.src = 'https://www.tiktok.com/embed.js'
-    s.async = true
-    document.body.appendChild(s)
-  }, [url])
+  // Extract video ID — alphanumeric including letters
+  const videoId = url.match(/\/video\/([A-Za-z0-9_-]+)/)?.[1] || ''
+  if (!videoId) return null
   return (
-    <div ref={ref} style={{
-      background:'#f8f8f8', minHeight:400,
-      display:'flex', alignItems:'center', justifyContent:'center',
-      padding:'8px', overflowX:'hidden',
-    }}>
-      <span style={{ color:'#888', fontSize:13 }}>⏳ Memuat video TikTok...</span>
+    <div style={{ position:'relative', paddingBottom:'177.77%', height:0, overflow:'hidden', background:'#000' }}>
+      <iframe
+        src={`https://www.tiktok.com/embed/v2/${videoId}?lang=id-ID`}
+        style={{ position:'absolute', top:0, left:0, width:'100%', height:'100%', border:'none' }}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        title={`TikTok ${videoId}`}
+        scrolling="no"
+      />
     </div>
   )
 }
