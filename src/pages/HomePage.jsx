@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import Select from 'react-select'
 import L from 'leaflet'
@@ -23,6 +23,39 @@ function LocationMarker({ position, setPosition, setAddress }) {
     },
   })
   return position ? <Marker position={position} /> : null
+}
+
+// ── X/Twitter embed component ──────────────────────────────
+function XEmbed({ url }) {
+  const ref = useRef(null)
+  useEffect(() => {
+    if (!ref.current) return
+    ref.current.innerHTML = ''
+    const anchor = document.createElement('a')
+    anchor.className = 'twitter-video'  // hint for widget
+    anchor.href = url
+    ref.current.appendChild(anchor)
+
+    if (window.twttr?.widgets) {
+      window.twttr.widgets.load(ref.current)
+    } else {
+      const s = document.createElement('script')
+      s.src = 'https://platform.twitter.com/widgets.js'
+      s.async = true
+      s.onload = () => window.twttr?.widgets?.load(ref.current)
+      document.head.appendChild(s)
+    }
+  }, [url])
+
+  return (
+    <div ref={ref} style={{
+      background:'#000', minHeight:300,
+      display:'flex', alignItems:'center', justifyContent:'center',
+      padding:'12px',
+    }}>
+      <span style={{ color:'#555', fontSize:13 }}>Memuat video X...</span>
+    </div>
+  )
 }
 
 const G  = '#1877F2'   // Facebook blue solid
@@ -393,16 +426,14 @@ export default function HomePage() {
             </div>
             <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))', gap:28 }}>
               {(settings.layanan||[]).filter(s=>s.video).map((s,i) => {
-                // Support YouTube URLs: full, short, embed
-                const getYtId = url => {
-                  if (!url) return null
-                  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)
-                  return m ? m[1] : null
-                }
-                const ytId = getYtId(s.video)
-                const embedUrl = ytId
-                  ? `https://www.youtube.com/embed/${ytId}?rel=0&modestbranding=1`
-                  : s.video // fallback: direct embed URL
+                const url = s.video || ''
+
+                // Detect YouTube
+                const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)
+                const ytId = ytMatch?.[1]
+
+                // Detect X/Twitter tweet
+                const isX = /(?:twitter\.com|x\.com)\/.+\/status\/(\d+)/.test(url)
 
                 return (
                   <div key={s.id||i} style={{
@@ -410,22 +441,29 @@ export default function HomePage() {
                     border:`1px solid rgba(24,119,242,0.10)`,
                     boxShadow:'0 4px 20px rgba(24,119,242,0.08)',
                   }}>
-                    {/* Video embed */}
-                    <div style={{ position:'relative', paddingBottom:'56.25%', height:0, overflow:'hidden' }}>
-                      <iframe
-                        src={embedUrl}
-                        title={s.nama}
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        style={{ position:'absolute', top:0, left:0, width:'100%', height:'100%' }}
-                      />
-                    </div>
+                    {/* ── YouTube embed ── */}
+                    {ytId && (
+                      <div style={{ position:'relative', paddingBottom:'56.25%', height:0, overflow:'hidden' }}>
+                        <iframe
+                          src={`https://www.youtube.com/embed/${ytId}?rel=0&modestbranding=1`}
+                          title={s.nama} frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          style={{ position:'absolute', top:0, left:0, width:'100%', height:'100%' }}
+                        />
+                      </div>
+                    )}
+
+                    {/* ── X/Twitter embed ── */}
+                    {isX && (
+                      <XEmbed url={url} />
+                    )}
+
                     {/* Caption */}
                     <div style={{ padding:'18px 20px' }}>
-                      <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:6 }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:10 }}>
                         <span style={{
-                          width:36, height:36, borderRadius:10, flexShrink:0,
+                          width:38, height:38, borderRadius:10, flexShrink:0,
                           background:BW, border:`1px solid rgba(24,119,242,0.12)`,
                           display:'flex', alignItems:'center', justifyContent:'center', fontSize:18,
                         }}>{s.icon||'💆'}</span>
@@ -437,7 +475,7 @@ export default function HomePage() {
                       <button onClick={() => goTo('sec-pesan','pesan')} style={{
                         width:'100%', padding:'10px', borderRadius:99, fontSize:13, fontWeight:700,
                         background:pc, color:W, border:'none', cursor:'pointer',
-                        boxShadow:`0 2px 10px rgba(24,119,242,0.22)`, fontFamily:sans, marginTop:8,
+                        boxShadow:`0 2px 10px rgba(24,119,242,0.22)`, fontFamily:sans,
                       }}>Pesan Layanan Ini</button>
                     </div>
                   </div>

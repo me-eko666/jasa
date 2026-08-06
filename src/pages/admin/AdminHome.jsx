@@ -269,22 +269,15 @@ export default function AdminHome() {
                     {layananForm.gambar && <img src={layananForm.gambar} alt="preview" className={styles.imgPreview} />}
                   </div>
                   <div className={`${styles.field} ${styles.fullWidth}`}>
-                    <label>URL Video YouTube (opsional)</label>
+                    <label>URL Video (YouTube atau X/Twitter)</label>
                     <input
                       value={layananForm.video||''}
                       onChange={e => setLayananForm(p => ({...p, video: e.target.value}))}
-                      placeholder="https://youtube.com/watch?v=... atau https://youtu.be/..."
+                      placeholder="https://youtu.be/xxx  atau  https://x.com/user/status/123..."
                     />
-                    {layananForm.video && (
-                      <div style={{ marginTop:8, borderRadius:10, overflow:'hidden', border:'1px solid rgba(24,119,242,0.15)', aspectRatio:'16/9' }}>
-                        <iframe
-                          src={`https://www.youtube.com/embed/${layananForm.video.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1]||''}`}
-                          style={{ width:'100%', height:'100%', border:'none' }}
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media"
-                          allowFullScreen title="preview"
-                        />
-                      </div>
-                    )}
+                    <small style={{ color:'#65748B', fontSize:12, marginTop:4 }}>
+                      Dukung: YouTube (youtu.be / youtube.com) dan X/Twitter (x.com/twitter.com/status/...)
+                    </small>
                   </div>
                 </div>
                 <div className={styles.editActions}>
