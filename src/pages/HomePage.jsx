@@ -32,10 +32,9 @@ function XEmbed({ url }) {
     if (!ref.current) return
     ref.current.innerHTML = ''
     const anchor = document.createElement('a')
-    anchor.className = 'twitter-video'  // hint for widget
+    anchor.className = 'twitter-video'
     anchor.href = url
     ref.current.appendChild(anchor)
-
     if (window.twttr?.widgets) {
       window.twttr.widgets.load(ref.current)
     } else {
@@ -46,14 +45,37 @@ function XEmbed({ url }) {
       document.head.appendChild(s)
     }
   }, [url])
-
   return (
-    <div ref={ref} style={{
-      background:'#000', minHeight:300,
-      display:'flex', alignItems:'center', justifyContent:'center',
-      padding:'12px',
-    }}>
+    <div ref={ref} style={{ background:'#000', minHeight:300, display:'flex', alignItems:'center', justifyContent:'center', padding:'12px' }}>
       <span style={{ color:'#555', fontSize:13 }}>Memuat video X...</span>
+    </div>
+  )
+}
+
+// ── TikTok embed component ─────────────────────────────────
+function TikTokEmbed({ url }) {
+  const ref = useRef(null)
+  useEffect(() => {
+    if (!ref.current) return
+    ref.current.innerHTML = `
+      <blockquote class="tiktok-embed"
+        cite="${url}"
+        data-video-id="${url.match(/\/video\/(\d+)/)?.[1]||''}"
+        style="max-width:100%;min-width:280px;border:none;">
+      </blockquote>`
+    if (window.TikTok) {
+      // already loaded
+      window.TikTok.reload?.()
+    } else {
+      const s = document.createElement('script')
+      s.src = 'https://www.tiktok.com/embed.js'
+      s.async = true
+      document.body.appendChild(s)
+    }
+  }, [url])
+  return (
+    <div ref={ref} style={{ background:'#000', minHeight:400, display:'flex', alignItems:'center', justifyContent:'center', padding:'8px', overflowX:'hidden' }}>
+      <span style={{ color:'#555', fontSize:13 }}>Memuat video TikTok...</span>
     </div>
   )
 }
@@ -435,6 +457,9 @@ export default function HomePage() {
                 // Detect X/Twitter tweet
                 const isX = /(?:twitter\.com|x\.com)\/.+\/status\/(\d+)/.test(url)
 
+                // Detect TikTok
+                const isTikTok = /tiktok\.com\/.+\/video\/\d+/.test(url)
+
                 return (
                   <div key={s.id||i} style={{
                     background:BG, borderRadius:20, overflow:'hidden',
@@ -457,6 +482,11 @@ export default function HomePage() {
                     {/* ── X/Twitter embed ── */}
                     {isX && (
                       <XEmbed url={url} />
+                    )}
+
+                    {/* ── TikTok embed ── */}
+                    {isTikTok && (
+                      <TikTokEmbed url={url} />
                     )}
 
                     {/* Caption */}

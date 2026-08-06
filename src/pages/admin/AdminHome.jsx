@@ -269,14 +269,14 @@ export default function AdminHome() {
                     {layananForm.gambar && <img src={layananForm.gambar} alt="preview" className={styles.imgPreview} />}
                   </div>
                   <div className={`${styles.field} ${styles.fullWidth}`}>
-                    <label>URL Video (YouTube atau X/Twitter)</label>
+                    <label>URL Video (YouTube, X/Twitter, atau TikTok)</label>
                     <input
                       value={layananForm.video||''}
                       onChange={e => setLayananForm(p => ({...p, video: e.target.value}))}
-                      placeholder="https://youtu.be/xxx  atau  https://x.com/user/status/123..."
+                      placeholder="https://youtu.be/xxx  |  https://x.com/user/status/123  |  https://tiktok.com/@user/video/123"
                     />
                     <small style={{ color:'#65748B', fontSize:12, marginTop:4 }}>
-                      Dukung: YouTube (youtu.be / youtube.com) dan X/Twitter (x.com/twitter.com/status/...)
+                      Dukung: YouTube · X/Twitter · TikTok
                     </small>
                   </div>
                 </div>
